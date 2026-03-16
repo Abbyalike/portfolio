@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abby Qi | Portfolio</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FAFAFA;
+            color: #18181B;
+            overflow-x: hidden;
+        }
+
+        /* Language Toggle Logic */
+        html[lang="en"] .zh { display: none !important; }
+        html[lang="zh"] .en { display: none !important; }
+
+        /* Nav Glassmorphism */
+        .nav-glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        /* Card Hover Effects */
+        .project-card img {
+            transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .project-card:hover img {
+            transform: scale(1.04);
+        }
+
+        /* Detail Page Transitions */
+        .page-view {
+            display: none;
+            opacity: 0;
+            animation: fadeIn 0.4s ease forwards;
+        }
+        .page-view.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* -------------------------------------------
+           Horizontal Spread Stacks (Optimized for smoothness)
+        ------------------------------------------- */
+        .detail-stack-wrapper { 
+            position: relative; 
+            width: 100%; 
+            height: 280px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            margin-bottom: 1.5rem;
+        }
+        
+        .detail-stack-wrapper::after {
+            content: '';
+            position: absolute;
+            top: -50px; bottom: -50px; left: -150px; right: -150px;
+            z-index: 0;
+        }
+
+        .detail-stack-wrapper img { 
+            position: absolute; 
+            width: 160px; 
+            height: 224px; 
+            object-fit: cover; 
+            border-radius: 6px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1); 
+            will-change: transform, box-shadow;
+            border: 1px solid rgba(0,0,0,0.05); 
+            z-index: 1;
+        }
+
+        .detail-stack-wrapper img:hover { 
+            z-index: 50 !important; 
+            transform: scale(1.08) translateY(-10px) !important; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            cursor: zoom-in; 
+        }
+        
+        .p4-group img:nth-child(1) { transform: rotate(-10deg) translateX(-15px); z-index: 1; }
+        .p4-group img:nth-child(2) { transform: rotate(-3deg) translateX(0); z-index: 2; }
+        .p4-group img:nth-child(3) { transform: rotate(4deg) translateX(15px); z-index: 3; }
+        .p4-group img:nth-child(4) { transform: rotate(11deg) translateX(30px); z-index: 4; }
+        
+        .detail-stack-wrapper:hover.p4-group img:nth-child(1) { transform: translateX(-260px) rotate(0); z-index: 4; }
+        .detail-stack-wrapper:hover.p4-group img:nth-child(2) { transform: translateX(-90px) rotate(0); z-index: 4; }
+        .detail-stack-wrapper:hover.p4-group img:nth-child(3) { transform: translateX(80px) rotate(0); z-index: 4; }
+        .detail-stack-wrapper:hover.p4-group img:nth-child(4) { transform: translateX(250px) rotate(0); z-index: 4; }
+
+        .p3-group img:nth-child(1) { transform: rotate(-8deg); z-index: 1; }
+        .p3-group img:nth-child(2) { transform: rotate(0); z-index: 2; }
+        .p3-group img:nth-child(3) { transform: rotate(8deg); z-index: 3; }
+        
+        .detail-stack-wrapper:hover.p3-group img:nth-child(1) { transform: translateX(-180px) rotate(0); z-index: 3; }
+        .detail-stack-wrapper:hover.p3-group img:nth-child(2) { transform: translateX(0) rotate(0); z-index: 3; }
+        .detail-stack-wrapper:hover.p3-group img:nth-child(3) { transform: translateX(180px) rotate(0); z-index: 3; }
+
+        @media (max-width: 768px) {
+            .detail-stack-wrapper:hover.p4-group img:nth-child(1) { transform: translateX(-100px) rotate(-5deg); }
+            .detail-stack-wrapper:hover.p4-group img:nth-child(4) { transform: translateX(100px) rotate(5deg); }
+            .detail-stack-wrapper:hover.p3-group img:nth-child(1) { transform: translateX(-80px) rotate(-5deg); }
+            .detail-stack-wrapper:hover.p3-group img:nth-child(3) { transform: translateX(80px) rotate(5deg); }
+        }
+
+        /* Hero Avatar Interactive */
+        .hero-avatar {
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .hero-avatar:hover {
+            transform: rotate(0deg) scale(1.05);
+        }
+
+        /* Copy Button Interactive */
+        .btn-copy {
+            width: 140px;
+            transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.2s;
+        }
+        .btn-copy:hover {
+            width: 245px;
+        }
+        .btn-copy.copied {
+            width: 120px;
+        }
+        .btn-copy .text-default { transition: opacity 0.3s; opacity: 1; }
+        .btn-copy .text-hover { transition: opacity 0.3s; opacity: 0; }
+        .btn-copy .text-success { transition: opacity 0.3s; opacity: 0; }
+        
+        .btn-copy:hover .text-default { opacity: 0; }
+        .btn-copy:hover .text-hover { opacity: 1; }
+        
+        .btn-copy.copied .text-default, 
+        .btn-copy.copied .text-hover { opacity: 0 !important; }
+        .btn-copy.copied .text-success { opacity: 1 !important; }
+
+        .parallax {
+            will-change: transform;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-zinc-900 selection:text-white">
+
+    <!-- GLOBAL NAVIGATION -->
+    <nav class="fixed w-full top-0 z-50 nav-glass px-6 py-4 flex justify-between items-center">
+        <!-- Left: Status (Avatar/Logo Removed for maximum minimal breathability) -->
+        <div class="flex items-center cursor-pointer" onclick="goHome()">
+            <div>
+                <h1 class="font-medium text-sm text-zinc-900 leading-tight">Abby Qi</h1>
+                <div class="flex items-center gap-1.5 mt-0.5">
+                    <span class="text-[11px] text-zinc-500">
+                        <span class="en">Results from action💪</span><span class="zh">行动造就结果💪</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center: Links -->
+        <div class="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-500">
+            <a href="#" onclick="goHome(); setTimeout(()=>window.scrollTo(0,0), 50)" class="hover:text-zinc-900 transition-colors"><span class="en">Home</span><span class="zh">首页</span></a>
+            <a href="#" onclick="goHome(); setTimeout(()=>document.getElementById('projects-section').scrollIntoView(), 50)" class="hover:text-zinc-900 transition-colors"><span class="en">Projects</span><span class="zh">项目</span></a>
+            <a href="#" onclick="goHome(); setTimeout(()=>document.getElementById('about-section').scrollIntoView(), 50)" class="hover:text-zinc-900 transition-colors"><span class="en">About</span><span class="zh">关于</span></a>
+        </div>
+
+        <!-- Right: Language & LinkedIn -->
+        <div class="flex items-center gap-5">
+            <!-- Language Switcher -->
+            <button onclick="toggleLanguage()" class="text-xs font-semibold tracking-wide flex items-center gap-1">
+                <span id="lang-en-btn" class="text-zinc-900 transition-colors">EN</span>
+                <span class="text-zinc-300 font-normal">/</span>
+                <span id="lang-zh-btn" class="text-zinc-400 font-normal hover:text-zinc-900 transition-colors">中</span>
+            </button>
+            
+            <!-- LinkedIn Button -->
+            <a href="https://www.linkedin.com/in/jiaxiqi" target="_blank" class="bg-zinc-900 text-white px-4 py-2 rounded-lg text-xs md:text-sm font-semibold hover:bg-zinc-800 transition-colors flex items-center gap-1.5 shadow-sm">
+                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                <span class="en">LinkedIn</span><span class="zh">领英</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- ========================================== -->
+    <!-- MAIN VIEW (Home, Projects Grid, About)     -->
+    <!-- ========================================== -->
+    <div id="view-home" class="page-view active">
+        
+        <!-- HERO SECTION -->
+        <header class="pt-24 pb-12 md:pt-32 md:pb-16 px-6 max-w-5xl mx-auto flex flex-col items-start text-left min-h-screen justify-center parallax" data-speed="-0.15">
+            
+            <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold text-zinc-900 tracking-tight mb-5 flex items-center gap-4">
+                <img src="https://raw.githubusercontent.com/Abbyalike/PotfolioWeb/main/501773585134_.pic.jpg" class="w-14 h-16 md:w-16 md:h-20 rounded-xl object-cover -rotate-6 hero-avatar shadow-md border border-zinc-200" alt="Abby Qi">
+                <span class="en">Hi, I'm Abby.</span><span class="zh">你好，我是 Abby。</span>
+            </h2>
+            <p class="text-zinc-500 text-lg md:text-xl max-w-2xl font-light leading-relaxed mb-10">
+                <span class="en">I'm a <strong class="text-zinc-900 font-medium">Data-Driven Storyteller</strong> & <strong class="text-zinc-900 font-medium">Journalist</strong>. <br class="hidden md:block"> Currently pursuing a Master of Journalism @ HKU.</span>
+                <span class="zh">我是一名<strong class="text-zinc-900 font-medium">数据驱动的故事讲述者</strong>与<strong class="text-zinc-900 font-medium">记者</strong>。<br class="hidden md:block"> 目前在香港大学攻读新闻学硕士学位。</span>
+            </p>
+
+            <!-- Copy Email Action -->
+            <div class="flex flex-col items-start gap-4">
+                <button id="copyBtn" onclick="copyEmail()" class="btn-copy relative flex items-center justify-center h-11 bg-zinc-900 text-white rounded-full overflow-hidden shadow-sm hover:bg-zinc-800">
+                    <span class="en text-default absolute font-medium text-sm">Copy my email</span>
+                    <span class="zh text-default absolute font-medium text-sm">复制我的邮箱</span>
+                    <span class="text-hover absolute font-mono text-xs md:text-sm">u3661838@connect.hku.hk</span>
+                    <span class="en text-success absolute font-medium text-sm text-emerald-400">Copied!</span>
+                    <span class="zh text-success absolute font-medium text-sm text-emerald-400">已复制！</span>
+                </button>
+                <div class="flex items-center gap-2 pl-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="text-sm text-zinc-500 font-medium">
+                        <span class="en">Available for work</span><span class="zh">寻求新机遇</span>
+                    </span>
+                </div>
+            </div>
+        </header>
+
+        <!-- PROJECTS GRID SECTION -->
+        <section id="projects-section" class="py-16 px-6 max-w-6xl mx-auto">
+            <h2 class="text-2xl font-bold text-zinc-900 mb-8">
+                <span class="en">My Favorite Projects</span><span class="zh">精选项目</span>
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                <!-- Card 1 -->
+                <div class="project-card group cursor-pointer" onclick="openProject('proj-1')">
+                    <div class="aspect-[4/3] rounded-xl overflow-hidden bg-white border border-zinc-200 shadow-sm relative">
+                        <img src="https://raw.githubusercontent.com/Abbyalike/PotfolioWeb/main/cover1.png" alt="Financial Journalism" class="w-full h-full object-cover">
+                    </div>
+                    <div class="mt-4">
+                        <p class="text-xs text-zinc-500 font-medium mb-1">
+                            <span class="en">Data & Analysis • 5 min</span><span class="zh">数据与分析 • 5 分钟阅读</span>
+                        </p>
+                        <h3 class="text-xl font-semibold text-zinc-900 group-hover:text-zinc-600 transition-colors">
+                            <span class="en">Financial & Data Journalism</span><span class="zh">财经与数据新闻</span>
+                        </h3>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="project-card group cursor-pointer" onclick="openProject('proj-2')">
+                    <div class="aspect-[4/3] rounded-xl overflow-hidden bg-white border border-zinc-200 shadow-sm relative">
+                        <img src="https://raw.githubusercontent.com/Abbyalike/PotfolioWeb/main/cover2.png" alt="Editorial Media" class="w-full h-full object-cover">
+                    </div>
+                    <div class="mt-4">
+                        <p class="text-xs text-zinc-500 font-medium mb-1">
+                            <span class="en">Lifestyle Media • 4 min</span><span class="zh">生活方式媒体 • 4 分钟阅读</span>
+                        </p>
+                        <h3 class="text-xl font-semibold text-zinc-900 group-hover:text-zinc-600 transition-colors">
+                            <span class="en">Editorial & Lifestyle Media</span><span class="zh">编辑与生活方式媒体</span>
+                        </h3>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="project-card group cursor-pointer" onclick="openProject('proj-3')">
+                    <div class="aspect-[4/3] rounded-xl overflow-hidden bg-white border border-zinc-200 shadow-sm relative">
+                        <img src="https://raw.githubusercontent.com/Abbyalike/PotfolioWeb/main/cover3.png" alt="Douyin Operations" class="w-full h-full object-cover">
+                    </div>
+                    <div class="mt-4">
+                        <p class="text-xs text-zinc-500 font-medium mb-1">
+                            <span class="en">Digital Marketing • 3 min</span><span class="zh">数字营销 • 3 分钟阅读</span>
+                        </p>
+                        <h3 class="text-xl font-semibold text-zinc-900 group-hover:text-zinc-600 transition-colors">
+                            <span class="en">Douyin Account Operation <i>Yuguo Tang</i></span><span class="zh">抖音账号运营 <i>雨果糖</i></span>
+                        </h3>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="project-card group cursor-pointer" onclick="openProject('proj-4')">
+                    <div class="aspect-[4/3] rounded-xl overflow-hidden bg-white border border-zinc-200 shadow-sm relative">
+                        <img src="https://raw.githubusercontent.com/Abbyalike/PotfolioWeb/main/cover4.png" alt="Visual Design" class="w-full h-full object-cover">
+                    </div>
+                    <div class="mt-4">
+                        <p class="text-xs text-zinc-500 font-medium mb-1">
+                            <span class="en">Visual Arts • Gallery</span><span class="zh">视觉艺术 • 画廊</span>
+                        </p>
+                        <h3 class="text-xl font-semibold text-zinc-900 group-hover:text-zinc-600 transition-colors">
+                            <span class="en">Visual Design & Poster Series</span><span class="zh">视觉设计与海报系列</span>
+                        </h3>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ABOUT SECTION -->
+        <section id="about-section" class="py-16 px-6 md:px-12 max-w-6xl mx-auto mb-12">
+            <div class="flex flex-col md:flex-row items-center md:items-start gap-10 md:gap-16">
+                
+                <!-- Left: Portrait Image -->
+                <div class="w-48 h-48 md:w-56 md:h-56 shrink-0 rounded-2xl overflow-hidden border border-zinc-200 bg-white shadow-sm">
+                    <img src="https://raw.githubusercontent.com/Abbyalike/PotfolioWeb/main/501773585134_.pic.jpg" alt="Abby Qi Portrait" class="w-full h-full object-cover filter grayscale hover:grayscale-0 transition-all duration-700">
+                </div>
+
+                <!-- Right: Text & Skills -->
+                <div class="flex-1 flex flex-col justify-center">
+                    <h2 class="text-2xl font-bold text-zinc-900 mb-6">
+                        <span class="en">About Me</span><span class="zh">关于我</span>
+                    </h2>
+                    
+                    <div class="space-y-4 text-zinc-600 text-sm font-light leading-relaxed mb-10">
+                        <p>
+                            <span class="en"><strong class="text-zinc-900 font-medium">Hi, I'm Abby.</strong> I am currently pursuing a Master of Journalism specializing in Financial Journalism at The University of Hong Kong.</span>
+                            <span class="zh"><strong class="text-zinc-900 font-medium">你好，我是 Abby。</strong>我目前在香港大学攻读新闻学硕士学位，主修财经新闻方向。</span>
+                        </p>
+                        <p>
+                            <span class="en">My work lives at the intersection of rigorous data analysis, creative storytelling, and digital strategy. Whether I'm building financial data dashboards, covering lifestyle trends, or leveraging AIGC tools to drive millions of views on social platforms, my goal is always to turn complex information into compelling, high-impact narratives.</span>
+                            <span class="zh">我的工作游走于严谨数据分析、创意叙事和数字战略的交汇点。无论是构建财务数据可视化、报道生活方式与文化趋势，还是利用 AIGC 工具在社交媒体上创造百万级曝光，我的目标始终是将复杂的信息转化为引人入胜、极具影响力的高质量叙事。</span>
+                        </p>
+                    </div>
+
+                    <!-- Toolkit Grid -->
+                    <div class="w-full">
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-6 text-zinc-600 text-sm font-light">
+                            <div>
+                                <strong class="block text-zinc-900 mb-3 font-medium">
+                                    <span class="en">Data & CMS</span><span class="zh">数据与内容管理</span>
+                                </strong>
+                                <ul class="space-y-1.5">
+                                    <li>R Programming</li>
+                                    <li>SPSS</li>
+                                    <li>WordPress</li>
+                                    <li>Quarto</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <strong class="block text-zinc-900 mb-3 font-medium">
+                                    <span class="en">Creative & AIGC</span><span class="zh">创意与 AIGC 工具</span>
+                                </strong>
+                                <ul class="space-y-1.5">
+                                    <li>Adobe CC (Ps, Ai, Pr)</li>
+                                    <li>Midjourney</li>
+                                    <li>Luma</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <strong class="block text-zinc-900 mb-3 font-medium">
+                                    <span class="en">Languages</span><span class="zh">语言能力</span>
+                                </strong>
+                                <ul class="space-y-1.5">
+                                    <li><span class="en">Mandarin (Native)</span><span class="zh">中文（母语）</span></li>
+                                    <li><span class="en">English (Professional)</span><span class="zh">英文（专业交流）</span></li>
+                                    <li><span class="en">Cantonese (Basic)</span><span class="zh">粤语（基础日常）</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center py-8 border-t border-zinc-200 text-zinc-400 text-xs">
+            <p>&copy; 2026 Abby Qi. <span class="en">Designed with intention.</span><span class="zh">用心设计。</span></p>
+        </footer>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- DETAIL PAGES (Single Page App Logic)       -->
+    <!-- ========================================== -->
+
+    <!-- PROJ 1: Financial & Data Journalism -->
+    <div id="view-proj-1" class="page-view pt-24 pb-20 px-6">
+        <div class="max-w-4xl mx-auto">
+            <button class="group mb-8 inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-900 transition-colors" onclick="goHome()">
+                <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> 
+                <span class="en">Back to Home</span><span class="zh">返回首页</span>
+            </button>
+
+            <div class="mb-10 parallax" data-speed="-0.04">
+                <span class="text-zinc-500 font-medium text-sm">
+                    <span class="en">Data & Analysis</span><span class="zh">数据与分析</span>
+                </span>
+                <h1 class="text-3xl md:text-4xl font-bold text-zinc-900 mt-2 mb-4">
+                    <span class="en">Financial & Data Journalism</span><span class="zh">财经与数据新闻</span>
+                </h1>
+            </div>
+
+            <!-- Item A: HK Buy-to-let -->
+            <div class="bg-white rounded-xl border border-zinc-200 shadow-sm p-6 md:p-8 mb-10 parallax" data-speed="0.02">
+                <h2 class="text-xl font-bold text-zinc-900 mb-1">
+                    <span class="en">Project A: HK Buy-to-let</span><span class="zh">项目 A：HK Buy-to-let 市场分析</span>
+                </h2>
+                <p class="text-zinc-500 text-xs mb-5">
+                    <span class="en">Independent Developer & Journalist</span><span class="zh">独立开发者与记者</span>
+                </p>
+                
+                <a href="https://abbyalike.quarto.pub/hk-buy-to-let/" target="_blank" class="block w-full bg-zinc-50 rounded-lg mb-6 p-4 md:p-6 flex flex-col items-center justify-center overflow-hidden hover:opacity-90 transition-opacity border border-zinc-100">
+                    <img src="https://raw.githubusercontent.com/Abbyalike/PotfolioWeb/main/cover1.png" class="max-w-md w-full rounded shadow-lg" alt="HK Buy to Let Project">
+                    <p class="text-[11px] text-zinc-400 mt-4 italic">
+                        <span class="en">Click image to view Interactive Quarto Project →</span><span class="zh">点击图片查看交互式 Quarto 项目网页 →</span>
+                    </p>
+                </a>
+
+                <div class="space-y-3 text-zinc-600 text-sm font-light leading-relaxed">
+                    <p>
+                        <strong class="text-zinc-900 font-medium"><span class="en">Overview:</span><span class="zh">项目概述：</span></strong> 
+                        <span class="en">Targeting the fragmented landscape of Hong Kong's residential property data (DATA.HK.GOV). I scraped, cleaned, analyzed, and visualized datasets using R and Quarto, solving the pain point of data illiteracy for everyday investors.</span>
+                        <span class="zh">针对香港复杂的住宅地产原始数据（DATA.HK.GOV）进行网络抓取、数据清洗、深度分析与可视化呈现，解决了原始数据碎片化、普通投资者难以直观解读市场长期趋势的痛点。</span>
+                    </p>
+                    <p>
+                        <strong class="text-zinc-900 font-medium"><span class="en">Impact:</span><span class="zh">项目成果：</span></strong> 
+                        <span class="en">Through technology-driven deep storytelling, the project reveals a 25-year trajectory of the rental market. The findings offer a historical perspective for those considering entering the market.</span>
+                        <span class="zh">通过技术驱动的深度数据叙事，向读者直观展示了过去25年间香港“买房出租”市场的变化规律，为考虑进入该市场的投资者提供了宝贵的历史视角和决策参考。</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Item B: Market Wrap -->
+            <div class="bg-white rounded-xl border border-zinc-200 shadow-sm p-6 md:p-8 parallax" data-speed="0.04">
+                <h2 class="text-xl font-bold text-zinc-900 mb-1">
+                    <span class="en">Project B: Market Wrap</span><span class="zh">项目 B：Market Wrap 宏观市场简报</span>
+                </h2>
+                <p class="text-zinc-500 text-xs mb-5 leading-relaxed">
+                    <span class="en">Writing Sample: Stock fell, silver plunged, and the dollar gained, followed by Trump’s Fed nomination (Jan 30, 2026)</span>
+                    <span class="zh">财经新闻写作样本：股市下跌，白银暴跌，美元上涨，随后特朗普提名美联储主席 (Jan 30, 2026)</span>
+                </p>
+                
+                <a href="#" onclick="event.preventDefault(); openProject('article-market-wrap')" class="block w-full bg-zinc-50 rounded-lg mb-6 p-4 md:p-6 flex flex-col items-center justify-center overflow-hidden hover:opacity-90 transition-opacity border border-zinc-100">
+                    <img src="https://raw.githubusercontent.com/Abbyalike/PotfolioWeb/main/market%20wrap.png" class="max-w-md w-full rounded shadow-lg" alt="Article snippet">
+                    <p class="text-[11px] text-zinc-400 mt-4 italic">
+                        <span class="en">Click image to read full article →</span><span class="zh">点击图片沉浸式阅读全文 →</span>
+                    </p>
+                </a>
+
+                <div class="space-y-3 text-zinc-600 text-sm font-light leading-relaxed">
+                    <p>
+                        <strong class="text-zinc-900 font-medium"><span class="en">Overview:</span><span class="zh">项目概述：</span></strong> 
+                        <span class="en">A rapid-response macroeconomic analysis covering the immediate market volatility following Donald Trump’s nomination of Kevin Warsh as Federal Reserve Chair.</span>
+                        <span class="zh">一篇关于“特朗普提名 Kevin Warsh 为美联储主席”后，全球股市、金价与美元剧烈波动的快速宏观经济新闻分析。</span>
+                    </p>
+                    <blockquote class="border-l-2 border-zinc-300 pl-4 my-3 italic text-zinc-500">
+                        "Silver plummeted 28%, gold tumbled 11%, both suffering their worst one-day slide since 1980."
+                    </blockquote>
+                    <p>
+                        <strong class="text-zinc-900 font-medium"><span class="en">Impact:</span><span class="zh">项目成果：</span></strong> 
+                        <span class="en">Demonstrates professional competency in covering macroeconomic events and analyzing their effects on financial markets.</span>
+                        <span class="zh">充分展现出对突发宏观经济事件的敏锐洞察力、快速分析能力，及其对全球资产市场影响的深度财经写作能力。</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUB-PAGE: FULL ARTICLE VIEW FOR MARKET WRAP -->
+    <div id="view-article-market-wrap" class="page-view pt-24 pb-20 px-6">
+        <div class="max-w-3xl mx-auto">
+            <!-- Back to Project 1 -->
+            <button class="group mb-12 inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-900 transition-colors" onclick="openProject('proj-1')">
+                <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> 
+                <span class="en">Back to Projects</span><span class="zh">返回项目列表</span>
+            </button>
+
+            <article>
+                <header class="mb-10 parallax" data-speed="-0.04">
+                    <p class="text-sm text-zinc-500 mb-3 font-medium tracking-wide uppercase">
+                        <span class="en">Financial News</span><span class="zh">财经新闻</span>
+                    </p>
+                    <h1 class="text-3xl md:text-4xl font-bold text-zinc-900 leading-tight mb-6">Market Wrap: Stock fell, silver plunged, and the dollar gained, followed by Trump’s Fed nomination</h1>
+                    <div class="flex items-center gap-3 text-sm text-zinc-500">
+                        <span><span class="en">By</span><span class="zh">作者：</span> <strong class="text-zinc-900 font-medium">Abby Qi</strong></span>
+                        <span>•</span>
+                        <span>Jan. 30, 2026</span>
+                    </div>
+                </header>
+
+                <div class="space-y-6 text-zinc-700 font-light leading-relaxed md:text-lg parallax" data-speed="0.02">
+                    <p>U.S. stocks fell Friday, while gold and silver plunged, amid a dollar rally following President Donald Trump’s nomination of Kevin Warsh as the new Federal Reserve Chair.</p>
+                    <p>The S&P 500 slipped 0.43% to 6939.03, its third straight down day. The tech-heavy Nasdaq fell 0.94% to 23461.82, and the Dow Jones Industrial Average pulled back 0.36% to finish at 48,892.47. The small-cap Russel 2000 dropped 1.55% to 2,613.74.</p>
+                    <p>Despite Friday’s weakness, all major indexes recorded a positive January. The S&P 500 and Dow logged monthly gains of 1.4% and 1.7%, respectively, while the Russell 2000 jumped more than 5.3% for its biggest monthly gain since August. The S&P also closed higher for the week, backing the downtrend for the other benchmarks.</p>
+                    <p>Spot silver plummeted 28% to $83.45, and spot gold tumbled 11% to $4713.90, both suffering their worst one-day slide since 1980. The sell-off in precious metals was driven by dollar strength.</p>
+                    <p>The ICE USD Index rose 0.9%, its sharpest increase since May. The greenback's weakness since last year has driven one of the biggest bull runs in precious metal on record.</p>
+                    <p>Known as an inflation hawk, Warsh warned of inflation risks from excessive easing while serving as Fed Governor from 2006-2011. He also spoke out against QE2 in 2010 when unemployment was still above 9%. The financial markets see lower odds of aggressive easing under Warsh's leadership, given his strong stance against inflation.</p>
+                    <p>Trump said that he "have no doubt that he [Warsh] will go down as one of the GREAT Fed Chairmen, maybe the best," in a Truth Social post.</p>
+                    <p>Treasury yields ended mixed, with the yield curve steepening. The two-year yield dropped 2.7 basis points to 3.524%, while the 10-year yield climbed 1.4 basis points to 4.241%.</p>
+                    <p>Seven out of eleven sectors in the S&P finished in red, with materials and information technology leading the decline, down 1.8% and 1.3% respectively. Consumer staples and energy fared better, up 1.4% and close to 1%.</p>
+                    <p>The S&P Material sector took the hardest hit on Friday, plunging 1.84% to 624.06. Leading the drop was Newmont Corp, the world’s largest gold miner, which slumped about 11%, directly tracking the massive decline in gold and silver.</p>
+                    <p>Applovin plummeted 16.89% after Google released a competing VR game development tool called Project Genie. KLA Crop plunged over 15% as the semi equipment firm guided for slower growth in the current quarter. Western Digital tanked, as investors took profit despite stronger than expected result and upbeat guidance.</p>
+                    <p>Apple edged up 0.46% as earnings best estimates on strong iPhone sales. But CEO Tim Cook warned that memory shortages could hurt future margins.</p>
+                    <p>Deckers Outdoor, the parent company of UGG and HOKA, skyrocketed 19.46% after quarterly EPS of $3.33 beat consensus estimates, and the firm raising its fiscal year 2026 revenue guidance to approximately $5.4 billion.</p>
+                    <p>Verizon Communications, the largest U.S. wireless carrier, surged 11.83% in its best day since 2008 after posting strong fourth-quarter earnings and a 2026 outlook that topped expectations. Major cable and broadband provider Charter Communications climbed 7.62% as it reported a smaller-than-expected loss of high-speed internet subscribers for the quarter.</p>
+                    <p>The CBOE Volatility Index edged up 0.56 to 17.44. Decliners lead advancers by 18 to 12 among the 30 Dow components.</p>
+                </div>
+            </article>
+        </div>
+    </div>
+
+
+    <!-- PROJ 2: Editorial & Lifestyle Media -->
+    <div id="view-proj-2" class="page-view pt-24 pb-20 px-6">
+        <div class="max-w-4xl mx-auto">
+            <button class="group mb-8 inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-900 transition-colors" onclick="goHome()">
+                <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> 
+                <span class="en">Back to Home</span><span class="zh">返回首页</span>
+            </button>
+            
+            <div class="mb-10 parallax" data-speed="-0.04">
+                <span class="text-zinc-500 font-medium text-sm">
+                    <span class="en">Lifestyle Media</span><span class="zh">生活方式媒体</span>
+                </span>
+                <h1 class="text-3xl md:text-4xl font-bold text-zinc-900 mt-2 mb-4">
+                    <span class="en">Editorial & Lifestyle Media</span><span class="zh">编辑与生活方式媒体</span>
+                </h1>
+                <p class="text-base text-zinc-600 font-light max-w-2xl">
+                    <strong class="text-zinc-900 font-medium">
+                        <span class="en">The Challenge:</span><span class="zh">面临挑战：</span>
+                    </strong> 
+                    <span class="en">Transforming standard corporate Press Releases into high-engagement, culturally relevant editorial content.</span>
+                    <span class="zh">如何将刻板的企业公关稿（Press Releases）转化为符合媒体调性、具备高受众参与度的编辑内容。</span>
+                    <br><br>
+                    <strong class="text-zinc-900 font-medium">
+                        <span class="en">Execution & Impact:</span><span class="zh">执行与成果：</span>
+                    </strong> 
+                    <span class="en">Outputting 1-2 articles daily via WordPress for Burda Luxury. By capturing the intersection of brands and Asian culture, my features drove significant organic traffic—peaking at 6,000+ views per article—directly enhancing commercial value.</span>
+                    <span class="zh">担任 Burda Luxury 实习生期间，通过 WordPress 高效高频产出（每日1-2篇），敏锐捕捉路易威登、阿迪达斯等大牌与亚洲文化的结合点。创作的内容成功驱动了显著的有机流量（单篇最高突破 6,000+ 阅读量），直接提升了媒体平台的商业价值。</span>
+                </p>
+            </div>
+
+            <!-- Mini Grid for Articles -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+                <a href="https://www.prestigeonline.com/hk/style/fashion/adidas-pet-collection-tang-jacket-chinese-new-year-2026/" target="_blank" class="group block parallax" data-speed="0.02">
+                    <div class="aspect-[4/5] rounded-lg overflow-hidden mb-3 bg-white border border-zinc-200">
+                        <img src="https://raw.githubusercontent.com/Abbyalike/PotfolioWeb/main/adidas.png" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Adidas">
+                    </div>
+                    <h3 class="text-zinc-900 font-medium text-sm leading-tight group-hover:text-zinc-500 transition-colors">Adidas Pet Collection Tang Jacket</h3>
+                </a>
+                
+                <a href="https://www.lifestyleasia.com/hk/whats-on/events-whats-on/louis-vuitton-bar-leone-yum-sing-bar-pop-up-lee-gardens/" target="_blank" class="group block parallax" data-speed="0.04">
+                    <div class="aspect-[4/5] rounded-lg overflow-hidden mb-3 bg-white border border-zinc-200">
+                        <img src="https://raw.githubusercontent.com/Abbyalike/PotfolioWeb/main/LV.png" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="LV">
+                    </div>
+                    <h3 class="text-zinc-900 font-medium text-sm leading-tight group-hover:text-zinc-500 transition-colors">Louis Vuitton x Bar Leone Pop-up</h3>
+                </a>
+
+                <a href="https://www.lifestyleasia.com/hk/style/fashion/uniqlo-ut-pokemon-30th-anniversary-collection/" target="_blank" class="group block parallax" data-speed="0.02">
+                    <div class="aspect-[4/5] rounded-lg overflow-hidden mb-3 bg-white border border-zinc-200">
+                        <img src="https://raw.githubusercontent.com/Abbyalike/PotfolioWeb/main/pokemon.png" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Pokemon">
+                    </div>
+                    <h3 class="text-zinc-900 font-medium text-sm leading-tight group-hover:text-zinc-500 transition-colors">Uniqlo UT Pokémon 30th Anniversary</h3>
+                </a>
+
+                <a href="https://www.lifestyleasia.com/hk/whats-on/events-whats-on/pop-mart-molly-20th-anniversary-exhibition-hong-kong/" target="_blank" class="group block parallax" data-speed="0.04">
+                    <div class="aspect-[4/5] rounded-lg overflow-hidden mb-3 bg-white border border-zinc-200">
+                        <img src="https://raw.githubusercontent.com/Abbyalike/PotfolioWeb/main/ppmt.png" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Popmart">
+                    </div>
+                    <h3 class="text-zinc-900 font-medium text-sm leading-tight group-hover:text-zinc-500 transition-colors">POP MART Molly 20th Anniversary</h3>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- PROJ 3: Douyin Account Operation -->
+    <div id="view-proj-3" class="page-view pt-24 pb-20 px-6">
+        <div class="max-w-3xl mx-auto">
+            <button class="group mb-8 inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-900 transition-colors" onclick="goHome()">
+                <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> 
+                <span class="en">Back to Home</span><span class="zh">返回首页</span>
+            </button>
+
+            <div class="mb-8 parallax" data-speed="-0.04">
+                <span class="text-zinc-500 font-medium text-sm">
+                    <span class="en">Digital Marketing & AIGC</span><span class="zh">数字营销与 AIGC</span>
+                </span>
+                <h1 class="text-3xl md:text-4xl font-bold text-zinc-900 mt-2 mb-6">
+                    <span class="en">Douyin Account Operation: <i>Yuguo Tang</i></span><span class="zh">抖音账号运营：<i>雨果糖</i></span>
+                </h1>
+            </div>
+
+            <!-- Image 1: Effect/Hero -->
+            <div class="w-full aspect-video rounded-xl overflow-hidden bg-white border border-zinc-200 shadow-sm mb-8 parallax" data-speed="0.03">
+                 <img src="https://raw.githubusercontent.com/Abbyalike/PotfolioWeb/main/%E9%9B%A8%E6%9E%9C%E7%B3%96.png" class="w-full h-full object-cover" alt="Douyin Video Effect">
+            </div>
+
+            <p class="text-base text-zinc-600 font-light leading-relaxed mb-10 parallax" data-speed="0.01">
+                <strong class="text-zinc-900 font-medium">
+                    <span class="en">The Goal:</span><span class="zh">项目背景与目标：</span>
+                </strong> 
+                <span class="en">Spearheaded the 0-to-1 creation of a short-video account dedicated to stray cat protection, navigating fierce platform competition and high production costs.</span>
+                <span class="zh">负责从零构建以流浪猫保护为主题的内容账号，应对短视频平台竞争激烈难曝光、传统内容产出成本高且制作周期长的严峻挑战。</span>
+            </p>
+
+            <!-- Image 2: Data Summary -->
+            <div class="w-full aspect-video rounded-xl overflow-hidden bg-white border border-zinc-200 shadow-sm mb-8 parallax" data-speed="0.02">
+                 <img src="https://raw.githubusercontent.com/Abbyalike/PotfolioWeb/main/%E9%9B%A8%E6%9E%9C%E7%B3%962.png" class="w-full h-full object-cover" alt="Data Summary Chart">
+            </div>
+            
+            <!-- Statistics Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 py-6 border-y border-zinc-200 mb-8 parallax" data-speed="0.04">
+                <div class="border-l border-zinc-200 pl-3">
+                    <div class="text-2xl font-bold text-zinc-900">6M+</div>
+                    <div class="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">
+                        <span class="en">Total Impressions</span><span class="zh">总曝光量</span>
+                    </div>
+                </div>
+                <div class="border-l border-zinc-200 pl-3">
+                    <div class="text-2xl font-bold text-zinc-900">9.5k+</div>
+                    <div class="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">
+                        <span class="en">Follower Growth</span><span class="zh">净增粉丝</span>
+                    </div>
+                </div>
+                <div class="border-l border-zinc-200 pl-3">
+                    <div class="text-2xl font-bold text-zinc-900">279k+</div>
+                    <div class="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">
+                        <span class="en">Interactions</span><span class="zh">互动总次数</span>
+                    </div>
+                </div>
+                <div class="border-l border-zinc-200 pl-3">
+                    <div class="text-2xl font-bold text-zinc-900">5M+</div>
+                    <div class="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">
+                        <span class="en">Viral Views</span><span class="zh">单视频最高播放</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audience Persona & Innovation -->
+            <div class="space-y-6 text-base text-zinc-600 font-light leading-relaxed parallax" data-speed="0.02">
+                <p>
+                    <strong class="text-zinc-900 font-medium">
+                        <span class="en">Audience Persona:</span><span class="zh">受众画像分析：</span>
+                    </strong> 
+                    <span class="en">Conducted initial benchmark analysis, identifying the core demographic primarily as females aged 24-48 who favor lifestyle vlogs, pet content, emotional resonance, and anthropomorphic animal narratives.</span>
+                    <span class="zh">在账号创建初期对同类对标账号进行了深度分析，总结出核心受众画像为主力分布在 24-48 岁的女性群体，其内容偏好集中于生活随拍、宠物、情感共鸣以及动物拟人化叙事。</span>
+                </p>
+                <p>
+                    <strong class="text-zinc-900 font-medium">
+                        <span class="en">The Innovation:</span><span class="zh">创新解决方案：</span>
+                    </strong> 
+                    <span class="en">Integrated AIGC tools (Midjourney, Luma) to revolutionize the traditional video production workflow. Analyzed audience behavior metrics to continuously optimize AI-assisted storytelling.</span>
+                    <span class="zh">突破性地引入了 Midjourney 与 Luma 等领先的 AIGC 生产工具，极大优化了传统短视频耗时的生产流；并在运营过程中持续分析受众行为数据，反哺并优化 AI 辅助内容的故事叙事性。</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- PROJ 4: Visual Design & Poster Series -->
+    <div id="view-proj-4" class="page-view pt-24 pb-20 px-6">
+        <div class="max-w-4xl mx-auto text-center">
+            
+            <!-- Left-aligned Back Button -->
+            <div class="text-left mb-8">
+                <button class="group inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-900 transition-colors" onclick="goHome()">
+                    <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> 
+                    <span class="en">Back to Home</span><span class="zh">返回首页</span>
+                </button>
+            </div>
+
+            <div class="mb-16 parallax" data-speed="-0.04">
+                <span class="text-zinc-500 font-medium text-sm">
+                    <span class="en">Visual Arts</span><span class="zh">视觉艺术</span>
+                </span>
+                <h1 class="text-3xl md:text-4xl font-bold text-zinc-900 mt-2 mb-4">
+                    <span class="en">Visual Design & Poster Series</span><span class="zh">视觉设计与海报系列</span>
+                </h1>
+                <p class="text-zinc-500 text-sm">
+                    <span class="en">Hover over the stacks below to spread the images neatly.</span>
+                    <span class="zh">将鼠标悬浮于下方的图片堆叠上即可展开图集。</span>
+                </p>
+            </div>
+
+            <!-- Vertical Layout with Horizontal Spread on Hover -->
+            <div class="flex flex-col gap-24">
+                
+                <!-- B-1 -->
+                <div class="parallax" data-speed="0.02">
+                    <h3 class="text-xl font-bold text-zinc-900 mb-2">
+                        <span class="en">Jiangsu Cultural Tourism</span><span class="zh">江苏文旅宣发海报</span>
+                    </h3>
+                    <p class="text-sm text-zinc-500 font-light px-4 mb-2">
+                        <span class="en">Based on campus surveys, targeting the 18-24 demographic to highlight the unique humanistic experiences of four cities.</span>
+                        <span class="zh">根据校园内范围的问卷调查反馈，18-24岁人群普遍关注旅游地点的独特人文与艺术体验项目。海报特此根据四座城市的独特底蕴分别制作。</span>
+                    </p>
+                    <p class="text-[11px] text-zinc-400 italic mb-6">
+                        <span class="en">Generated by Midjourney</span><span class="zh">由 Midjourney 生成</span>
+                    </p>
+                    
+                    <div class="detail-stack-wrapper p4-group mx-auto max-w-2xl">
+                        <img src="https://raw.githubusercontent.com/Abbyalike/PotfolioWeb/main/1%E6%89%AC%E5%B7%9E.jpg" alt="Jiangsu 1">
+                        <img src="https://raw.githubusercontent.com/Abbyalike/PotfolioWeb/main/2%E5%8D%97%E4%BA%AC.jpg" alt="Jiangsu 2">
+                        <img src="https://raw.githubusercontent.com/Abbyalike/PotfolioWeb/main/3%E8%8B%8F%E5%B7%9E.jpg" alt="Jiangsu 3">
+                        <img src="https://raw.githubusercontent.com/Abbyalike/PotfolioWeb/main/4%E5%8D%97%E9%80%9A.jpg" alt="Jiangsu 4">
+                    </div>
+                </div>
+
+                <!-- B-2 -->
+                <div class="parallax" data-speed="0.04">
+                    <h3 class="text-xl font-bold text-zinc-900 mb-2">
+                        <span class="en">Body Manual</span><span class="zh">《身体手册》科普海报</span>
+                    </h3>
+                    <p class="text-sm text-zinc-500 font-light px-4 mb-6">
+                        <span class="en">A set of science posters that reveal the unexpected secrets of the human body.</span>
+                        <span class="zh">一组揭示人体那些意想不到秘密的创意科普海报。</span>
+                    </p>
+                    <div class="detail-stack-wrapper p3-group mx-auto max-w-xl">
+                        <img src="https://raw.githubusercontent.com/Abbyalike/PotfolioWeb/main/%E7%A7%91%E6%99%AE%E6%B5%B7%E6%8A%A5-1.jpg" alt="Body 1">
+                        <img src="https://raw.githubusercontent.com/Abbyalike/PotfolioWeb/main/%E7%A7%91%E6%99%AE%E6%B5%B7%E6%8A%A5-2.jpg" alt="Body 2">
+                        <img src="https://raw.githubusercontent.com/Abbyalike/PotfolioWeb/main/%E7%A7%91%E6%99%AE%E6%B5%B7%E6%8A%A5-3.jpg" alt="Body 3">
+                    </div>
+                </div>
+
+                <!-- B-3 -->
+                <div class="parallax" data-speed="0.02">
+                    <h3 class="text-xl font-bold text-zinc-900 mb-2">
+                        <span class="en">POP MART: A Minute of Multiverse</span><span class="zh">泡泡玛特：A Minute of Multiverse</span>
+                    </h3>
+                    <p class="text-sm text-zinc-500 font-light px-4 mb-3">
+                        <span class="en">"Eyes open, I am myself; eyes closed, I am the universe."</span>
+                        <span class="zh">“睁眼做自己，闭眼拥抱宇宙。”（Eyes open, I am myself; eyes closed, I am the universe.）</span>
+                    </p>
+                    <span class="inline-block px-2 py-1 bg-zinc-100 text-zinc-600 border border-zinc-200 text-[10px] uppercase rounded mb-6">
+                        <span class="en">University-level 2nd Class Prize</span><span class="zh">全国大广赛 校级二等奖</span>
+                    </span>
+                    <div class="detail-stack-wrapper mx-auto max-w-sm">
+                        <!-- Single image doesn't need a group spread -->
+                        <img src="https://raw.githubusercontent.com/Abbyalike/PotfolioWeb/main/ppmt2.png" alt="Popmart" style="transform: rotate(2deg); z-index: 1;">
+                    </div>
+                </div>
+
+            </div>
+        </article>
+    </div>
+
+    <!-- JavaScript for SPA Routing & Interactions -->
+    <script>
+        const views = ['view-home', 'view-proj-1', 'view-proj-2', 'view-proj-3', 'view-proj-4', 'view-article-market-wrap'];
+
+        function hideAllViews() {
+            views.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) {
+                    el.classList.remove('active');
+                }
+            });
+        }
+
+        function openProject(projectId) {
+            hideAllViews();
+            const target = document.getElementById('view-' + projectId);
+            if(target) {
+                target.classList.add('active');
+                window.scrollTo(0, 0); 
+            }
+        }
+
+        function goHome() {
+            hideAllViews();
+            const home = document.getElementById('view-home');
+            if(home) {
+                home.classList.add('active');
+            }
+        }
+
+        function copyEmail() {
+            const email = "u3661838@connect.hku.hk";
+            const el = document.createElement('textarea');
+            el.value = email;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            
+            const btn = document.getElementById('copyBtn');
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.classList.remove('copied');
+            }, 2000);
+        }
+
+        function toggleLanguage() {
+            const html = document.documentElement;
+            const currentLang = html.getAttribute('lang') || 'en';
+            const newLang = currentLang === 'en' ? 'zh' : 'en';
+            
+            // Toggle HTML language attribute
+            html.setAttribute('lang', newLang);
+            
+            // Visual toggle of the buttons
+            const enBtn = document.getElementById('lang-en-btn');
+            const zhBtn = document.getElementById('lang-zh-btn');
+            
+            if (newLang === 'en') {
+                enBtn.className = 'text-zinc-900 transition-colors';
+                zhBtn.className = 'text-zinc-400 font-normal hover:text-zinc-900 transition-colors';
+            } else {
+                zhBtn.className = 'text-zinc-900 transition-colors';
+                enBtn.className = 'text-zinc-400 font-normal hover:text-zinc-900 transition-colors';
+            }
+        }
+
+        // Smooth Parallax Effect Listener (Optimized with LERP & RequestAnimationFrame)
+        document.addEventListener('DOMContentLoaded', () => {
+            const parallaxElements = document.querySelectorAll('.parallax');
+            let currentScrollY = window.scrollY;
+            let targetScrollY = window.scrollY;
+
+            // Track the target scroll position instantly
+            window.addEventListener('scroll', () => {
+                targetScrollY = window.scrollY;
+            });
+
+            // Continuously animate towards the target for a buttery smooth feel
+            function renderParallax() {
+                // Prevent extreme rubber-banding during SPA page changes
+                if (Math.abs(targetScrollY - currentScrollY) > 800) {
+                    currentScrollY = targetScrollY;
+                } else {
+                    // Linear Interpolation (LERP): gradually closes the distance by 8% per frame
+                    currentScrollY += (targetScrollY - currentScrollY) * 0.08;
+                }
+
+                // Only update DOM if there's a meaningful visual change to save CPU
+                if (Math.abs(targetScrollY - currentScrollY) > 0.05 || Math.abs(targetScrollY - currentScrollY) === 0) {
+                    parallaxElements.forEach(el => {
+                        let speed = parseFloat(el.getAttribute('data-speed')) || 0;
+                        if (speed !== 0) {
+                            // translate3d forces GPU hardware acceleration
+                            el.style.transform = `translate3d(0, ${currentScrollY * speed}px, 0)`;
+                        }
+                    });
+                }
+
+                // Loop the animation
+                requestAnimationFrame(renderParallax);
+            }
+
+            // Start the loop
+            requestAnimationFrame(renderParallax);
+        });
+    </script>
+</body>
+</html>
